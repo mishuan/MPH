@@ -1,11 +1,12 @@
 package mph;
 
-import java.io.BufferedReader;
-import java.io.FileReader;
 import java.io.IOException;
-import java.io.LineNumberReader;
+import java.security.NoSuchAlgorithmException;
 
 /**
+ * Minimal Perfect Hash
+ * 
+ * Class to create minimal hash for given input
  * 
  * @author Michael Yuan
  * 
@@ -15,6 +16,8 @@ public class MinPerfectHash {
    final int keysPerBin = 4;
    Poko[] pokos;
    int binCount;
+   int m;
+   int n;
 
    /**
     * Constructor Using an Input File
@@ -22,8 +25,9 @@ public class MinPerfectHash {
     * @param file file being parsed into string array to be hashed
     * @throws IOException
     */
-   MinPerfectHash(String file) throws IOException {
-      rawData = fileToStringArray(file);
+   public MinPerfectHash(String file) throws IOException {
+      rawData = Utility.fileToStringArray(file);
+      init();
    }
 
    /**
@@ -31,8 +35,25 @@ public class MinPerfectHash {
     * 
     * @param dataArray array being hashed
     */
-   MinPerfectHash(String[] dataArray) {
+   public MinPerfectHash(String[] dataArray) {
       rawData = dataArray;
+      init();
+   }
+
+   /*
+    * Set Bin Count
+    */
+   protected void init() {
+      m = rawData.length;
+      binCount = m / keysPerBin + 1;
+      n = (int) (m / (keysPerBin * 0.5d) + 1);
+      if (n % 2 == 0)
+         n++;
+      while (true) {
+         if (Utility.isPseudoPrime(n))
+            break;
+         n += 2;
+      }
    }
 
    /**
@@ -41,14 +62,16 @@ public class MinPerfectHash {
     * Create an array of Pokos using the input data
     * 
     * @return
+    * @throws NoSuchAlgorithmException
     */
-   private Poko[] createPokos() {
+   protected Poko[] createPokos() throws NoSuchAlgorithmException {
       Poko[] pokos = new Poko[rawData.length];
       for (int i = 0; i < rawData.length; i++) {
-         int[] h = new int[3];
-         // TODO: create the hashes
-         pokos[i].key = rawData[i];
-         pokos[i].h = h;
+         String hexString = Utility.hash256_16bytes(rawData[i], 9);
+         pokos[i] = new Poko();
+         pokos[i].bucketNum = Integer.valueOf(hexString.subSequence(0, 6).toString(), 16) % binCount;
+         pokos[i].f = Integer.valueOf(hexString.subSequence(6, 12).toString(), 16);
+         pokos[i].h = Integer.valueOf(hexString.subSequence(12, 18).toString(), 16);
       }
       return pokos;
    }
@@ -57,8 +80,10 @@ public class MinPerfectHash {
     * Generate Minimal Perfect Hash
     * 
     * Using the given input, generate minimal perfect hash (or perfect hash, undecided yet)
+    * 
+    * @throws NoSuchAlgorithmException
     */
-   public void genMPH() {
+   public void genMPH() throws NoSuchAlgorithmException {
       pokos = createPokos();
    }
 
@@ -80,28 +105,6 @@ public class MinPerfectHash {
 
    }
 
-   /**
-    * File to String Array
-    * 
-    * Takes an input file and convert it to a string array
-    * 
-    * @param file file being converted to string array
-    * @return
-    * @throws IOException
-    */
-   private String[] fileToStringArray(String file) throws IOException {
-      LineNumberReader lnr = new LineNumberReader(new FileReader(file));
-      lnr.skip(Long.MAX_VALUE);
-      int lines = lnr.getLineNumber();
-      lnr.close();
-      BufferedReader bc_br = new BufferedReader(new FileReader(file));
-      String[] data = new String[lines];
-      for (int i = 0; i < lines; i++) {
-         data[i] = bc_br.readLine();
-      }
-      bc_br.close();
-      return data;
-   }
 
    /**
     * Plain Old Key Object (Get it?)
@@ -109,8 +112,9 @@ public class MinPerfectHash {
     * @author Michael Yuan
     * 
     */
-   class Poko {
-      String key;
-      int[] h = new int[3];
+   protected class Poko {
+      protected int bucketNum;
+      protected int f;
+      protected int h;
    }
 }
