@@ -20,7 +20,7 @@ public class MinPerfectHashTest {
 
    @Test
    public void createPokosTest() throws NoSuchAlgorithmException {
-      Poko[] pk = mph.createPokos();
+      Poko[] pk = mph.createPokosAndBuckets();
       assertEquals(names.length, pk.length);
    }
 
