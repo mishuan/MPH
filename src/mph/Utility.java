@@ -36,9 +36,8 @@ public class Utility {
       lnr.close();
       BufferedReader bc_br = new BufferedReader(new FileReader(file));
       String[] data = new String[lines];
-      for (int i = 0; i < lines; i++) {
+      for (int i = 0; i < lines; i++)
          data[i] = bc_br.readLine();
-      }
       bc_br.close();
       return data;
    }

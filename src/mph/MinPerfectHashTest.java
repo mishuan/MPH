@@ -4,8 +4,6 @@ import static org.junit.Assert.assertEquals;
 
 import java.security.NoSuchAlgorithmException;
 
-import mph.MinPerfectHash.Poko;
-
 import org.junit.Before;
 import org.junit.Test;
 
@@ -14,20 +12,26 @@ public class MinPerfectHashTest {
    MinPerfectHash mph;
 
    @Before
-   public void setup() {
+   public void setup() throws NoSuchAlgorithmException {
       mph = new MinPerfectHash(names);
+      mph.genMPH(false);
    }
 
    @Test
-   public void createPokosTest() throws NoSuchAlgorithmException {
-      Poko[] pk = mph.createPokosAndBuckets();
-      assertEquals(names.length, pk.length);
+   public void mapPokosTest() throws NoSuchAlgorithmException {
+      assertEquals(names.length, mph.pokos.length);
+      assertEquals(5, mph.buckets.get(0).size());
+      assertEquals(2, mph.buckets.get(1).size());
    }
 
    @Test
    public void initTest() throws NoSuchAlgorithmException {
-      assertEquals(mph.m, 7);
-      assertEquals(mph.keysPerBin, 4);
-      System.out.println(mph.n);
+      assertEquals(7, mph.m);
+      assertEquals(4, mph.keysPerBucket);
+   }
+
+   @Test
+   public void searchAndPlaceTest() {
+      mph.searchAndPlace(false);
    }
 }

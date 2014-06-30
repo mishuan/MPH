@@ -2,7 +2,8 @@ package mph;
 
 import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
-import java.util.List;
+import java.util.ArrayList;
+import java.util.LinkedList;
 
 /**
  * Minimal Perfect Hash
@@ -13,14 +14,15 @@ import java.util.List;
  * 
  */
 public class MinPerfectHash {
-   String[] rawData;
-   final int keysPerBin = 4;
-   Poko[] pokos;
+   final int keysPerBucket = 4;
    int binCount;
    int m;
    int n;
-   //TODO: figure out and learn your data structures
-   List<Integer>[] buckets;
+
+   Poko[] pokos;
+   String[] rawData;
+   ArrayList<LinkedList<Integer>> buckets;
+   int[] dispTable;
 
    /**
     * Constructor Using an Input File
@@ -38,6 +40,8 @@ public class MinPerfectHash {
     * @param dataArray array being hashed
     */
    public MinPerfectHash(String[] dataArray) {
+      if (dataArray == null || dataArray.length == 0)
+         throw new IllegalArgumentException();
       rawData = dataArray;
    }
 
@@ -46,8 +50,9 @@ public class MinPerfectHash {
     */
    protected void init() {
       m = rawData.length;
-      binCount = m / keysPerBin + 1;
-      n = (int) (m / (keysPerBin * 0.5d) + 1);
+      binCount = m / keysPerBucket + 1;
+      n = (int) (m / 0.5d + 1);
+      dispTable = new int[binCount];
       if (n % 2 == 0)
          n++;
       while (true) {
@@ -55,6 +60,9 @@ public class MinPerfectHash {
             break;
          n += 2;
       }
+      buckets = new ArrayList<LinkedList<Integer>>(binCount);
+      for (int i = 0; i < binCount; i++)
+         buckets.add(i, new LinkedList<Integer>());
    }
 
    /**
@@ -65,8 +73,7 @@ public class MinPerfectHash {
     * @return
     * @throws NoSuchAlgorithmException
     */
-   protected Poko[] createPokosAndBuckets() throws NoSuchAlgorithmException {
-      // TODO: assign buckets heres
+   protected Poko[] mapPokosAndBuckets() throws NoSuchAlgorithmException {
       Poko[] pokos = new Poko[rawData.length];
       for (int i = 0; i < rawData.length; i++) {
          String hexString = Utility.hash256_16bytes(rawData[i], 9);
@@ -75,8 +82,58 @@ public class MinPerfectHash {
          pokos[i].bucketNum = bucketNum;
          pokos[i].f = Integer.valueOf(hexString.subSequence(6, 12).toString(), 16) % n;
          pokos[i].h = Integer.valueOf(hexString.subSequence(12, 18).toString(), 16) % (n - 1) + 1;
+         buckets.get(bucketNum).add(i);
       }
       return pokos;
+   }
+
+   /*
+    * Search for a mapping that maps all the keys
+    */
+   protected void searchAndPlace(boolean random) {
+      boolean[] filled = new boolean[n];
+      int index = 0;
+
+      for (LinkedList<Integer> list : buckets) {
+         int size = list.size();
+         if (size == 0)
+            continue;
+
+         int[] probe = new int[2];
+         int[] position = new int[size];
+         boolean found = false;
+
+         while (!found) {
+            found = true;
+            int k = 0;
+            for (int i : list) {
+               position[k] = (pokos[i].f + pokos[i].h * probe[0] + probe[1]) % n;
+               if (filled[position[k]]) {
+                  found = false;
+                  for (int j = 0; j < k; j++)
+                     filled[position[j]] = false;
+                  break;
+               }
+               filled[position[k]] = true;
+               k++;
+            }
+            probe[0]++;
+            if (probe[0] >= n) {
+               probe[0] -= n;
+               probe[1]++;
+            }
+         }
+
+         dispTable[index] = probe[0] + probe[1] * n;
+         index++;
+      }
+   }
+
+   /**
+    * Permute the ordering of the buckets TODO: you can write this later.
+    */
+   protected void permuteBucketOrder() {
+
    }
 
    /**
@@ -84,11 +141,15 @@ public class MinPerfectHash {
     * 
     * Using the given input, generate minimal perfect hash (or perfect hash, undecided yet)
     * 
+    * @param random if you need to start at random positions of rho i, then toggle random. Normally
+    *        rho i would start at 0
     * @throws NoSuchAlgorithmException
     */
-   public void genMPH() throws NoSuchAlgorithmException {
+
+   public void genMPH(boolean random) throws NoSuchAlgorithmException {
       init();
-      pokos = createPokosAndBuckets();
+      pokos = mapPokosAndBuckets();
+      searchAndPlace(random);
    }
 
    /**
