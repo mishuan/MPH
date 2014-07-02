@@ -7,7 +7,7 @@ import java.io.LineNumberReader;
 import java.security.*;
 
 public class Utility {
-   public static String hash256_16bytes(String data, int numBytes) throws NoSuchAlgorithmException {
+   public static String hash256(String data, int numBytes) throws NoSuchAlgorithmException {
       MessageDigest md = MessageDigest.getInstance("SHA-256");
       md.update(data.getBytes());
       return bytesToHex(md.digest()).substring(0, numBytes * 2);

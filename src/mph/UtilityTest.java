@@ -10,9 +10,9 @@ import org.junit.Test;
 public class UtilityTest {
    @Test
    public void test() throws NoSuchAlgorithmException, UnsupportedEncodingException {
-      String a = Utility.hash256_16bytes("michaelyuan", 8);
-      String b = Utility.hash256_16bytes("michaelyuan", 16);
-      String c = Utility.hash256_16bytes("michaelyuan", 32);
+      String a = Utility.hash256("michaelyuan", 8);
+      String b = Utility.hash256("michaelyuan", 16);
+      String c = Utility.hash256("michaelyuan", 32);
       assertEquals(16, a.length());
       assertEquals(32, b.length());
       assertEquals(64, c.length());
