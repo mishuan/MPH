@@ -1,6 +1,7 @@
 package mph;
 
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.util.ArrayList;
@@ -24,7 +25,7 @@ public class MinPerfectHash {
    Poko[] pokos;
    String[] rawData;
    ArrayList<LinkedList<Integer>> buckets;
-   int[] dispTable;
+   long[] dispTable;
    int[] mappings;
 
    /**
@@ -55,7 +56,7 @@ public class MinPerfectHash {
       m = rawData.length;
       bucketCount = m / keysPerBucket + 1;
       n = (int) (m / 0.5d + 1);
-      dispTable = new int[bucketCount];
+      dispTable = new long[bucketCount];
       mappings = new int[bucketCount];
       for (int i = 0; i < bucketCount; i++) {
          mappings[i] = i;
@@ -109,9 +110,9 @@ public class MinPerfectHash {
          permuteBucketOrder();
       }
       // end
-      
+
       SecureRandom sr = new SecureRandom();
-      long nSquared = (long)n * (long)n;
+      long nSquared = (long) n * (long) n;
       for (LinkedList<Integer> list : buckets) {
          int size = list.size();
          if (size == 0)
@@ -158,10 +159,10 @@ public class MinPerfectHash {
             }
             tries++;
          }
-         
+
          if (tries >= maxTries)
             throw new Exception("Could not complete mapping.  Tried all displacements.");
-         dispTable[mappings[index]] = probe[0] + probe[1] * n;
+         dispTable[mappings[index]] = (long) probe[0] + (long) probe[1] * (long) n;
          index++;
       }
    }
@@ -212,8 +213,16 @@ public class MinPerfectHash {
     * 
     * Output the theta i for every bin that was used to achieve perfect mapping
     */
-   public void writeMphMapping() {
-
+   public void writeMphMapping(String filename) {
+      try {
+         PrintWriter writer = new PrintWriter(filename, "UTF-8");
+         for (long i : dispTable) {
+            writer.println(i);
+         }
+         writer.close();
+      } catch (IOException e) {
+         e.getStackTrace();
+      }
    }
 
 

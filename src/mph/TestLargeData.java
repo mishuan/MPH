@@ -7,9 +7,10 @@ public class TestLargeData {
       long init = System.nanoTime();
       MinPerfectHash mph = new MinPerfectHash("cdata.txt");
       mph.genMPH(true, true);
-      // for (int i : mph.dispTable) {
-      // System.out.println(i);
-      // }
+//      for (long i : mph.dispTable) {
+//         System.out.println(i);
+//      }
+      mph.writeMphMapping("testing123");
       System.out.println(System.nanoTime() - init);
    }
 }
