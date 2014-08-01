@@ -6,13 +6,39 @@ import java.io.IOException;
 import java.io.LineNumberReader;
 import java.security.*;
 
+/**
+ * Utility
+ * 
+ * Utility class containing utility functions that MPH uses
+ * 
+ * @author Michael Yuan
+ * 
+ */
 public class Utility {
+   /**
+    * hash256
+    * 
+    * Returns the first numBytes bytes of SHA256 hash of given data
+    * 
+    * @param data input data
+    * @param numBytes number of bytes required from the SHA-256 hash
+    * @return
+    * @throws NoSuchAlgorithmException
+    */
    public static String hash256(String data, int numBytes) throws NoSuchAlgorithmException {
       MessageDigest md = MessageDigest.getInstance("SHA-256");
       md.update(data.getBytes());
       return bytesToHex(md.digest()).substring(0, numBytes * 2);
    }
 
+   /**
+    * Bytes to Hex
+    * 
+    * Converts byte array to hex string
+    * 
+    * @param bytes
+    * @return
+    */
    private static String bytesToHex(byte[] bytes) {
       StringBuffer result = new StringBuffer();
       for (byte byt : bytes)
@@ -20,6 +46,14 @@ public class Utility {
       return result.toString();
    }
 
+   /**
+    * Hex String to Byte Array
+    * 
+    * Converts string to byte array
+    * 
+    * @param s
+    * @return
+    */
    public static byte[] hexStringToByteArray(String s) {
       int len = s.length();
       byte[] data = new byte[len / 2];
@@ -29,6 +63,17 @@ public class Utility {
       return data;
    }
 
+   /**
+    * File to String Array
+    * 
+    * Input file path and line count of said file, converts the file into an array with each line
+    * being an entry
+    * 
+    * @param file
+    * @param lineCount
+    * @return
+    * @throws IOException
+    */
    public static String[] fileToStringArray(String file) throws IOException {
       LineNumberReader lnr = new LineNumberReader(new FileReader(file));
       lnr.skip(Long.MAX_VALUE);
@@ -42,6 +87,17 @@ public class Utility {
       return data;
    }
 
+   /**
+    * Is Pseudo Prime
+    * 
+    * Takes a number n and determines with very high probability whether it is a prime or not
+    * 
+    * This method utilizes the well known Miller-Rabin primality test. This specific implementation
+    * is provided by Kristian of mathblog.dk.
+    * 
+    * @param n
+    * @return
+    */
    public static boolean isPseudoPrime(int n) {
       if (n <= 1)
          return false;
