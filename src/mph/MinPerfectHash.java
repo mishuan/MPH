@@ -27,6 +27,13 @@ public class MinPerfectHash {
    Poko[] pokos;
    String[] rawData;
 
+   /**
+    * Get Raw Data
+    * 
+    * Get the data array with mappings constructed by the MPH
+    * 
+    * @return
+    */
    public String[] getRawData() {
       return rawData;
    }
@@ -207,7 +214,7 @@ public class MinPerfectHash {
     * @param randomDisp if you need to start at random positions of rho i, then toggle randomDisp.
     *        Normally rho i would start at 0
     * @param randomPermutation if you need random permutation of bucket order placement, toggle this
-    *        
+    * 
     * @throws Exception
     */
    public void genMPH(boolean randomDisp, boolean randomPermutation) throws Exception {
